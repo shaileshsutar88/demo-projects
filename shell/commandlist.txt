@@ -1,0 +1,40 @@
+    2  yum install -y nginx
+    3  yum install -y php56
+    4  yum install -y php56-fpm
+    5  chkconfig nginx on
+    6  /etc/init.d/nginx start
+    7  chkconfig --level 2345 nginx on
+    8  groupadd client
+    9  groupdel client
+   10  groupdel devgroup
+   11  groupadd devgroup
+   12  useradd -G root,devgroup devuser
+   13  passwd devuser
+   14  vim /etc/php-fpm.d/www.conf
+   15  cd /var/www/html/
+   16  ls
+   17  mkdir example.com
+   18  mkdir example.com_maintenace
+   19  mv example.com_maintenace example.com_maintenance/
+   20  usermod -a -G devgroup nginx
+   21  chmod -R 775 example.com example.com_maintenance/
+   22  /etc/init.d/php-fpm start
+   23  vim /etc/nginx/conf.d/virtual.conf
+   24  vim /etc/nginx/nginx.conf
+   25  /etc/init.d/nginx restart
+   26  vim /etc/nginx/conf.d/virtual.conf
+   27  /etc/init.d/nginx restart
+   28  vim /etc/nginx/conf.d/virtual.conf
+   29  /etc/init.d/nginx restart
+   30  curl ipecho.net/plain
+   31  vim /etc/hosts
+   32  vim /etc/nginx/conf.d/virtual.conf
+   33  ls -la
+   34  mv example.com_maintenance/ maintenance.example.com
+   35  /etc/init.d/nginx restart
+   36  vim example.com/index.php
+   37  cat example.com/index.php maintenance.example.com/index.php
+   38  cat example.com/index.php > maintenance.example.com/index.php
+   39  vim maintenance.example.com/index.php
+   40  vim example.com/index.php
+   41  cat /etc/hosts
