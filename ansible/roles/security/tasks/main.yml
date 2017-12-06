@@ -1,0 +1,21 @@
+- name: "copy security files"
+  copy: src={{ item.src }} dest={{ item.dest }} owner={{ item.owner }} group={{ item.group }} mode={{ item.mode }}
+  with_items:
+    - { src: '../files/sysctl.conf', dest: '/etc/sysctl.conf', owner: 'root', group: 'root', mode: '0644' }
+
+- name: "edit config files"
+  command: "{{ item }}"
+  become: true
+  become_method: sudo
+  with_items:
+    - sed -i 's:order hosts,bind:order bind,hosts:g' /etc/host.conf
+    - sed -i 's:multi on:nospoof on:g' /etc/host.conf
+
+- name: "Restart services"
+  service: >
+    name= "{{ item }}"
+    state=restarted
+  with_items:
+    - sysctl
+    - networking
+    - ssh

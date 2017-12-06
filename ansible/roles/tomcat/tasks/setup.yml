@@ -1,0 +1,70 @@
+- include_vars: vars/version.yml
+
+- name: "Install default-jdk"
+  apt: >
+    pkg={{ item }}
+    state=installed 
+    update_cache=yes
+  with_items:
+    - default-jdk
+
+- name: "Create tomcat usergroup"
+  group:
+    name: tomcat
+    state: present
+
+- name: "Add tomcat user"
+  user: 
+    name: tomcat
+    groups: tomcat
+    state: present
+    home: /opt/tomcat/
+    shell: /bin/false
+
+- name: "Download tomcat tar file"
+  get_url: 
+    url: http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v{{ version }}/bin/apache-tomcat-{{ version }}.tar.gz
+    dest: /tmp/
+
+- name: "Extract tomcat tar"
+  command: "{{ item }}"
+  become: yes
+  become_method: sudo
+  with_items:
+    - tar xvfz /tmp/apache-tomcat-{{ version }}.tar.gz -C /opt/tomcat --strip-components=1
+
+- name: "Set tomcat user permissions on content" 
+  command: "{{ item }}"
+  become: yes
+  become_method: sudo
+  with_items:
+    - chgrp -R tomcat /opt/tomcat
+    - chmod -R g+r /opt/tomcat/conf
+    - chmod g+x /opt/tomcat/conf
+    - chown -R tomcat /opt/tomcat/webapps/ /opt/tomcat/work/ /opt/tomcat/temp/ /opt/tomcat/logs/
+
+- name: "Copy tomcat.service file"
+  copy: src={{ item.src }} dest={{ item.dest }} owner={{ item.owner }} group={{ item.group }} mode={{ item.mode }}
+  with_items:
+    - { src: '../files/tomcat.service', dest: '/etc/systemd/system/tomcat.service', owner: 'root', group: 'root', mode: '0644' }
+    - { src: '../files/tomcat-users.xml', dest: '/opt/tomcat/conf', owner: 'root', group: 'tomcat', mode: '0640' }
+    - { src: '../files/manager.xml', dest: '/opt/tomcat/webapps/manager/META-INF/context.xml', owner: 'tomcat', group: 'tomcat', mode: '0640' }
+    - { src: '../files/host-manager.xml', dest: '/opt/tomcat/webapps/host-manager/META-INF/context.xml', owner: 'tomcat', group: 'tomcat', mode: '0640' }
+
+- name: "Update Java alternatives"
+  command: "{{ item }}"
+  become: yes
+  become_method: sudo
+  with_items:
+    - systemctl enable tomcat.service
+    - systemctl daemon-reload
+    - systemctl start tomcat
+    - sudo ufw allow 8080
+
+- name: "Restart tomcat service"
+  service: >
+    name= "{{ item }}"
+    state=restarted
+  with_items:
+    - tomcat
+    - networking

@@ -1,0 +1,40 @@
+- name: "Installing Base Packages"
+  apt: >
+    pkg={{ item }}
+    state=latest
+    update_cache=yes
+    cache_valid_time=3600
+  with_items:
+  - vim
+  - htop
+  - dnsutils
+  - ansible
+  - tree
+  - curl
+  - screen
+  - traceroute
+  - unattended-upgrades
+  - sysstat
+  - sysfsutils
+
+- name: "Edit config file"
+  command: "{{ item }}"
+  become: yes
+  become_method: sudo
+  with_items:
+    - sed -i 's:AutoFixInterruptedDpkg "False";:AutoFixInterruptedDpkg "True";:g' /etc/apt/apt.conf.d/50unattended-upgrades
+    - sed -i 's:Remove-Unused-Dependencies "False";:Remove-Unused-Dependencies "True";:g' /etc/apt/apt.conf.d/50unattended-upgrades
+
+- name: "Copy files"
+  copy: src={{ item.src }} dest={{ item.dest }} owner={{ item.owner }} group={{ item.group }} mode={{ item.mode }}
+  with_items:
+    - { src: '../files/thp.conf', dest: '/etc/sysfs.d/thp.conf', owner: 'root', group: 'root', mode: '0644' }
+    - { src: '../files/thp.conf', dest: '/etc/sysfs.d/clocksource.conf', owner: 'root', group: 'root', mode: '0644' }
+
+- name: "Enable sysfsutils service & start it using command"
+  command: "{{ item }}"
+  become: yes
+  become_method: sudo
+  with_items:
+    - systemctl enable sysfsutils.service
+    - systemctl start sysfsutils.service

@@ -1,0 +1,9 @@
+- name: "Install essential packages"
+  yum: >
+  pkg=xfsprogs
+  state=latest
+
+- name: "Device block report"
+  command: "{{ item }}"
+  with_items:
+    - sudo blockdev --report > $home/devblock.log

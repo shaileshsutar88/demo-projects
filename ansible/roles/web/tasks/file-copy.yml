@@ -1,0 +1,4 @@
+- name: "Copy config files"
+  copy: src={{ item.src }} dest={{ item.dest }} owner={{ item.owner }} group={{ item.group }} mode={{ item.mode }}
+  with_items:
+    - { src: '../files/default', dest: '/etc/nginx/sites-available/default', owner: 'root', group: 'root', mode: '0644' }

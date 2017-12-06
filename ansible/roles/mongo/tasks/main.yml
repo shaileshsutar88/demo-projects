@@ -1,0 +1,4 @@
+---
+
+- include: essential-install.yml
+- include: reboot-cron.yml

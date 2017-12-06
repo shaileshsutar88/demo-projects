@@ -1,0 +1,8 @@
+---
+
+- include: nginx-install.yml
+- include: mysql-install.yml
+- include: php-install.yml
+- include: edit-config.yml
+- include: file-copy.yml
+- include: app-clone.yml

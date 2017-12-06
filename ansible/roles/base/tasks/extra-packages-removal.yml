@@ -1,0 +1,6 @@
+- name: "Removing extra packages"
+  apt: pkg={{ item }} state=absent
+  with_items:
+  - landscape-common
+  - landscape-client
+  - popularity-contest

@@ -1,0 +1,4 @@
+- name: Application git clone
+  git: 
+    repo: https://github.com/shaileshsutar88/deploy.git
+    dest: /var/www/html
